@@ -1,4 +1,4 @@
-# Laya MCP for Node.js
+# Decision Router using Laya MCP on Hermes Agent 
 
 A Model Context Protocol (MCP) stdio server for [ConvAI Innovations' Laya](https://github.com/NandhaKishorM/laya) decision models.
 
