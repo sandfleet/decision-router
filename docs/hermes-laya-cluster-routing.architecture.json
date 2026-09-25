@@ -1,0 +1,183 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Hermes + Laya Deployment Decision Router",
+    "subtitle": "Laya selects the next verified workflow step; Hermes enforces evidence and authorization gates.",
+    "output": "docs/hermes-laya-cluster-routing.architecture.html",
+    "quality_profile": "showcase",
+    "visual_preset": "signal-flow",
+    "views": [
+      {
+        "id": "decision-loop",
+        "label": "Decision loop",
+        "focus": ["operator", "hermes", "laya_mcp", "laya_service"],
+        "note": "Hermes sends bounded context to Laya and receives a typed, confidence-gated route decision."
+      },
+      {
+        "id": "kubernetes-path",
+        "label": "Kubernetes path",
+        "focus": ["hermes", "kubernetes", "k8s_workload", "audit_log"],
+        "note": "A Kubernetes result leads to preflight, reviewed apply, rollout, and service verification."
+      },
+      {
+        "id": "openshift-path",
+        "label": "OpenShift path",
+        "focus": ["hermes", "openshift", "oc_workload", "audit_log"],
+        "note": "An OpenShift result leads to Project, image, Route, rollout, and endpoint verification."
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "operator",
+      "type": "external",
+      "label": "Operator",
+      "sublabel": "deployment request + approval",
+      "pos": [40, 300],
+      "size": [145, 66]
+    },
+    {
+      "id": "hermes",
+      "type": "backend",
+      "label": "Hermes LLM Harness",
+      "sublabel": "MCP client + evidence gates",
+      "pos": [245, 298],
+      "size": [164, 70],
+      "tag": "orchestrator"
+    },
+    {
+      "id": "laya_mcp",
+      "type": "backend",
+      "label": "Laya MCP Wrapper",
+      "sublabel": "stdio MCP → HTTP",
+      "pos": [480, 175],
+      "size": [160, 66],
+      "tag": "read-only"
+    },
+    {
+      "id": "laya_service",
+      "type": "cloud",
+      "label": "Laya Decision Service",
+      "sublabel": "typed choice + confidence",
+      "pos": [705, 175],
+      "size": [164, 66],
+      "tag": "local runtime"
+    },
+    {
+      "id": "audit_log",
+      "type": "database",
+      "label": "Decision Audit Log",
+      "sublabel": "laya-events.jsonl",
+      "pos": [480, 475],
+      "size": [160, 64],
+      "tag": "sanitized events"
+    },
+    {
+      "id": "kubernetes",
+      "type": "cloud",
+      "label": "Kubernetes / kind",
+      "sublabel": "kubectl + Kustomize",
+      "pos": [705, 340],
+      "size": [164, 66],
+      "tag": "selected branch"
+    },
+    {
+      "id": "openshift",
+      "type": "cloud",
+      "label": "OpenShift / OKD",
+      "sublabel": "oc + Project + Route",
+      "pos": [705, 500],
+      "size": [164, 66],
+      "tag": "selected branch"
+    },
+    {
+      "id": "k8s_workload",
+      "type": "backend",
+      "label": "nodejs-k8s Workload",
+      "sublabel": "Deployment + Service",
+      "pos": [970, 340],
+      "size": [170, 66],
+      "tag": "health + ready"
+    },
+    {
+      "id": "oc_workload",
+      "type": "backend",
+      "label": "nodejs-oc Workload",
+      "sublabel": "Deployment + Service + Route",
+      "pos": [970, 500],
+      "size": [170, 66],
+      "tag": "Route verified"
+    }
+  ],
+  "connections": [
+    {
+      "from": "operator",
+      "to": "hermes",
+      "label": "request + approval",
+      "labelAt": [215, 384],
+      "variant": "emphasis"
+    },
+    {
+      "from": "hermes",
+      "to": "laya_mcp",
+      "label": "MCP: classify / judge / route_step",
+      "variant": "emphasis"
+    },
+    {
+      "from": "laya_mcp",
+      "to": "laya_service",
+      "label": "typed decision request",
+      "labelAt": [673, 255],
+      "variant": "security"
+    },
+    {
+      "from": "laya_service",
+      "to": "hermes",
+      "label": "decision + probabilities + gate",
+      "variant": "emphasis",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "from": "hermes",
+      "to": "audit_log",
+      "label": "sanitized event",
+      "variant": "dashed"
+    },
+    {
+      "from": "hermes",
+      "to": "kubernetes",
+      "label": "Kubernetes decision → verified workflow",
+      "variant": "emphasis"
+    },
+    {
+      "from": "hermes",
+      "to": "openshift",
+      "label": "OpenShift decision → verified workflow",
+      "variant": "emphasis"
+    },
+    {
+      "from": "kubernetes",
+      "to": "k8s_workload",
+      "label": "apply → rollout → Service test",
+      "labelAt": [920, 420]
+    },
+    {
+      "from": "openshift",
+      "to": "oc_workload",
+      "label": "apply → rollout → Route test",
+      "labelAt": [920, 580]
+    }
+  ],
+  "cards": [
+    {
+      "dot": "violet",
+      "title": "Control and verification contract",
+      "items": [
+        "Laya selects a route; a failed confidence gate triggers evidence gathering or escalation.",
+        "Hermes logs sanitized events and requires authorization, render, rollout, endpoint, and target-specific checks before applying."
+      ]
+    }
+  ]
+}
