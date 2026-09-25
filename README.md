@@ -263,4 +263,4 @@ npm run build
 
 ## License
 
-This wrapper is provided as an independent integration. Laya model/runtime licensing is governed by the upstream ConvAI Innovations project and model repositories.
+GNU General Public License v3.0
