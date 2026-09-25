@@ -1,5 +1,9 @@
 # Decision Router using Laya MCP on Hermes Agent 
 
+The project assumes locally running Kubernetes/Kind Cluster, Openshift/OKD Cluster, Hermes Agent.
+The nodejs-oc & nodejs-k8s are projects based upon Openshift & Kubernetes nuances respectively.
+Laya is used by Hermes Agent to decide & route deployment to either of them.
+
 A Model Context Protocol (MCP) stdio server for [ConvAI Innovations' Laya](https://github.com/NandhaKishorM/laya) decision models.
 
 The Node.js process owns the MCP protocol and translates tool calls to the official `laya-serve` HTTP API. Laya performs the local model inference; this wrapper does not call a generative LLM or an external decision API.
