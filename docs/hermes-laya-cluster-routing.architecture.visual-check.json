@@ -6,7 +6,7 @@
   "status": "pass",
   "visualReview": "pending",
   "artifact": {
-    "path": "/home/abhishek/Downloads/decision-router/docs/hermes-laya-cluster-routing.architecture.html",
+    "path": "docs/hermes-laya-cluster-routing.architecture.html",
     "sha256": "a7e8882ffb0b6c3cd70445b860f86ffc6fdc824b71e3afab54d54308da2ca9cf",
     "bytes": 811812
   },

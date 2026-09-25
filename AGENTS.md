@@ -15,8 +15,8 @@ Use these instructions before choosing a local deployment target. Discovery is r
 2. If CRC is installed and reports `OKD: Running`, use CRC's client and kubeconfig explicitly for every OpenShift command. `crc oc-env` adds the CRC-provided `oc` binary to `PATH`; it does not select the CRC cluster by itself.
 
    ```bash
-   export PATH="/home/abhishek/.crc/bin/oc:$PATH"
-   export KUBECONFIG=/home/abhishek/.crc/machines/crc/kubeconfig
+   eval "$(crc oc-env)"
+   export KUBECONFIG="$HOME/.crc/machines/crc/kubeconfig"
    oc whoami
    oc project
    oc get nodes -o wide
@@ -82,10 +82,10 @@ Before making a platform-selection or deployment-routing decision, an LLM must r
 8. **Log every routing call and result.** Immediately append the tool name, sanitized request, raw response, selected label or step, probability distribution, confidence fields, gate result, and decision scope to `laya-events.jsonl`. Keep one JSON object per line so the file is append-only and machine-readable.
 9. **Enforce evidence and safety gates.** A Laya decision routes the workflow; it does not authorize an external action. If the Laya confidence gate fails, stop routing and gather the missing evidence or request user review. Explicit API/resource evidence resolves an ambiguous platform result and must be recorded as an override. Normal target-context, namespace, image, authorization, render, rollout, endpoint, and user-approval requirements remain mandatory before a state-changing command.
 
-`laya-events.jsonl` is an audit log, not an Obsidian note. Create it only when the first Laya call is made. Preserve prior lines; append rather than rewrite. Use a concrete absolute project path when writing to it:
+`laya-events.jsonl` is an audit log, not an Obsidian note. Create it only when the first Laya call is made. Preserve prior lines; append rather than rewrite. Use the resolved absolute project path when writing to it:
 
 ```text
-/home/abhishek/Downloads/decision-router/laya-events.jsonl
+$(pwd)/laya-events.jsonl
 ```
 
 ## Platform selection rule
