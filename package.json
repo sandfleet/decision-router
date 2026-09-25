@@ -1,0 +1,27 @@
+{
+  "name": "laya-mcp-node",
+  "version": "0.1.0",
+  "description": "Node.js MCP stdio wrapper for ConvAI Innovations Laya",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "npm run typecheck && npm run build && node scripts/validate-runtime.mjs",
+    "start": "node dist/src/index.js",
+    "dev": "tsx src/index.ts",
+    "calibrate": "tsx scripts/fit-judge-temperature.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/server": "^2.1.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0"
+  }
+}

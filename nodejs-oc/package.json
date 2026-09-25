@@ -1,0 +1,16 @@
+{
+  "name": "nodejs-oc",
+  "version": "1.0.0",
+  "description": "Node.js application for OpenShift deployment",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["openshift", "nodejs", "kubernetes"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

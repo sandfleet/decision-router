@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>nodejs-oc</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 600px;
+      padding: 40px;
+      animation: slideIn 0.6s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    h1 {
+      color: #1e3c72;
+      margin-bottom: 10px;
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 30px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .info-panel {
+      background: #f5f7fa;
+      border-left: 4px solid #2a5298;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 4px;
+      font-family: 'Monaco', 'Courier New', monospace;
+      font-size: 13px;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      margin: 10px 0;
+      line-height: 1.6;
+    }
+
+    .info-label {
+      color: #666;
+      font-weight: 600;
+      min-width: 100px;
+    }
+
+    .info-value {
+      color: #2a5298;
+      font-weight: 500;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 30px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-primary {
+      background: #2a5298;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #1e3c72;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(42, 82, 152, 0.3);
+    }
+
+    .btn-secondary {
+      background: #e8eef5;
+      color: #2a5298;
+    }
+
+    .btn-secondary:hover {
+      background: #d4dce8;
+      transform: translateY(-2px);
+    }
+
+    .status {
+      margin-top: 20px;
+      padding: 12px;
+      background: #e8f5e9;
+      border-left: 4px solid #4caf50;
+      border-radius: 4px;
+      color: #2e7d32;
+      font-size: 13px;
+      display: none;
+    }
+
+    .status.show {
+      display: block;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    .status.error {
+      background: #ffebee;
+      border-color: #f44336;
+      color: #c62828;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      color: #999;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>nodejs-oc</h1>
+    <div class="subtitle">OpenShift Application</div>
+
+    <div class="info-panel">
+      <div class="info-row">
+        <span class="info-label">Status</span>
+        <span class="info-value" id="status">Loading...</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">App Version</span>
+        <span class="info-value" id="version">—</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Environment</span>
+        <span class="info-value" id="environment">—</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Pod Name</span>
+        <span class="info-value" id="pod">—</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Last Updated</span>
+        <span class="info-value" id="timestamp">—</span>
+      </div>
+    </div>
+
+    <div class="button-group">
+      <button class="btn-primary" onclick="fetchInfo()">Refresh Info</button>
+      <button class="btn-secondary" onclick="checkHealth()">Health Check</button>
+    </div>
+
+    <div class="status" id="status-message"></div>
+
+    <footer>
+      Ready to deploy on OpenShift / Kubernetes
+    </footer>
+  </div>
+
+  <script>
+    async function fetchInfo() {
+      try {
+        const response = await fetch('/api/info');
+        const data = await response.json();
+
+        document.getElementById('status').textContent = 'Operational';
+        document.getElementById('version').textContent = data.version;
+        document.getElementById('environment').textContent = data.environment;
+        document.getElementById('pod').textContent = data.pod;
+        document.getElementById('timestamp').textContent = new Date(data.timestamp).toLocaleString();
+
+        showStatus('Info fetched successfully', false);
+      } catch (error) {
+        showStatus('Error fetching info: ' + error.message, true);
+      }
+    }
+
+    async function checkHealth() {
+      try {
+        const response = await fetch('/health');
+        const data = await response.json();
+
+        if (response.ok) {
+          showStatus('✓ Health check passed - Server is running', false);
+        } else {
+          showStatus('✗ Health check failed', true);
+        }
+      } catch (error) {
+        showStatus('✗ Health check failed: ' + error.message, true);
+      }
+    }
+
+    function showStatus(message, isError) {
+      const statusEl = document.getElementById('status-message');
+      statusEl.textContent = message;
+      statusEl.classList.add('show');
+      statusEl.classList.toggle('error', isError);
+
+      setTimeout(() => {
+        statusEl.classList.remove('show');
+      }, 4000);
+    }
+
+    window.addEventListener('load', fetchInfo);
+  </script>
+</body>
+</html>

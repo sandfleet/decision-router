@@ -1,0 +1,10 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nodejs-oc
+spec:
+  template:
+    spec:
+      containers:
+        - name: nodejs-oc
+          image: image-registry.openshift-image-registry.svc:5000/nodejs-oc/nodejs-oc@sha256:fb9719525f9613e93e580950fb989f49345b789548e52cfd9c621c997ab9b389
